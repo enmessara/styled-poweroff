@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+
+#Pinging google.com
+echo "Sending network probes to google.com check network connectivity..."
+#Initial attempt
+ATTEMPT=1
+#Maximum number of attempts to be tried
+MAX_ATTEMPT=10
+#Retry while maximum number is less than or equal to 10
+while [[ "$ATTEMPT" -le "$MAX_ATTEMPT" ]];do
+  ping -c 2 8.8.8.8 >/dev/null 2>&1
+
+  if [[ "$?" -eq 0 ]];then
+    echo "Yay :) You are connected"
+    sleep 0.75
+    echo "You can now do whatever you want"
+    exit 0
+  fi
+
+  echo "Right now there is no network connectivity :( .Trying "$ATTEMPT"/"$MAX_ATTEMPT""
+
+  sleep 10
+
+  ((ATTEMPT++))
+
+done
+#Go to failsafe after all attempts
+echo "I have tried for ${MAX_ATTEMPT} but failed.Powering off in 10 minutes to save power..."
+shutdown +10 2>/dev/null
+sleep 1
+#Informational info-Maybe a user is using and application that does not depend on internet
+echo "You can press 'shutdown -c' to cancel the operation"
