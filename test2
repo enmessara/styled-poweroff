@@ -7,10 +7,24 @@ echo "Sending network probes to google.com check network connectivity..."
 ATTEMPT=1
 #Maximum number of attempts to be tried
 MAX_ATTEMPT=10
+#Shutdown function
+shutdown_function(){
+  #Information info to a user maybe s/he is using an app which is internet independent
+  echo "I'll start my countdown to power off process you can press 'Ctrl+C' to cancel"
+  #600 seconds power off to countdown
+  for i in {0..600..10};do
+    echo "I'll be powering off in 600seconds,now am on $i/600"
+    sleep 10
+  done
+  #Aggressive shutdown :).Just kidding...a new way of shutdown I learnt
+init 0
+
+}
 #Retry while maximum number is less than or equal to 10
 while [[ "$ATTEMPT" -le "$MAX_ATTEMPT" ]];do
+  #The actual pinging while discarding both output and errors
   ping -c 2 8.8.8.8 >/dev/null 2>&1
-
+#Message user sees after successful echo reply
   if [[ "$?" -eq 0 ]];then
     echo "Yay :) You are connected"
     sleep 0.75
@@ -19,15 +33,17 @@ while [[ "$ATTEMPT" -le "$MAX_ATTEMPT" ]];do
   fi
 
   echo "Right now there is no network connectivity :( .Trying "$ATTEMPT"/"$MAX_ATTEMPT""
+  #Informing a user that the attempts are finished
+  if [[ "$ATTEMPT" -eq "$MAX_ATTEMPT" ]]; then
+    sleep 2
+    echo "Exhausted all my attempts.Continuing to the next action..."
+  fi
 
-  sleep 10
+  sleep 1
 
   ((ATTEMPT++))
+  
 
 done
-#Go to failsafe after all attempts
-echo "I have tried for ${MAX_ATTEMPT} but failed.Powering off in 10 minutes to save power..."
-shutdown +10 2>/dev/null
-sleep 1
-#Informational info-Maybe a user is using and application that does not depend on internet
-echo "You can press 'shutdown -c' to cancel the operation"
+#Calling the function
+shutdown_function
